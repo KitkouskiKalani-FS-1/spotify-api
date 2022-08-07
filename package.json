@@ -1,0 +1,30 @@
+{
+  "name": "spotify-api",
+  "version": "1.0.0",
+  "description": "This project is one that will allow the user to utilize a search bar in order to find artists, playlists and whole albums that most closely match their search criteria. This will be done through the use of the [Spotify Web API](https://developer.spotify.com/documentation/web-api/) and will include both frontend and backend. The frontend is based off of a predetermined design but implemented by me within the project.",
+  "main": "index.js",
+  "scripts": {
+    "dev":"nodemon server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/KitkouskiKalani-FS-1/spotify-api.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/KitkouskiKalani-FS-1/spotify-api/issues"
+  },
+  "homepage": "https://github.com/KitkouskiKalani-FS-1/spotify-api#readme",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.1",
+    "express": "^4.18.1",
+    "mongoose": "^6.5.1",
+    "mysql2": "^2.3.3",
+    "nodemon": "^2.0.19",
+    "path": "^0.12.7"
+  }
+}
