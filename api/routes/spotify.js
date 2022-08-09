@@ -3,7 +3,7 @@ const router = express.Router();
 
 //Read all
 router.get('/', (req,res) =>{
-    res.send('Spotify Read All')
+    res.json({"header": "Spotify Homepage"})
 })
 
 //Read one
