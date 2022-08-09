@@ -28,8 +28,8 @@ function App() {
       await fetch(`${API_BASE}/spotify`)
         .then(res => res.json())
         .then(data=>{
-          console.log(data)
           setInfo(data)
+          console.log(info.header)
         })
     } catch{
       setError(error|| "Unexpected Error")
@@ -41,6 +41,7 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
+        <h2>Welcome</h2>
         {
           <h1>{info.header}</h1>
         }
