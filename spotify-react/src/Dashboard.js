@@ -34,7 +34,6 @@ function Dashboard({code}) {
   return (
     <div className="App">
       <Container>
-        <div>{code}</div>
         <InputGroup>
           <FormControl
             placeholder="Search Spotify"
