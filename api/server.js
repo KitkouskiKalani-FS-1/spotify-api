@@ -1,11 +1,13 @@
 const express = require('express');
 require('dotenv').config();
+const bodyParser = require("body-parser")
 const mongoose = require('mongoose');
 const path= require('path');
 const cors= require('cors');
 
 const app= express();
 app.use(cors());
+app.use(bodyParser.json())
 
 const PORT = process.env.PORT || 3001;
 
@@ -18,7 +20,7 @@ db.on('error', error => console.log(error))
 db.once('open', ()=> console.log("Database Connection Established"))
 
 const spotifyRouter = require('./routes/spotify')
-app.use('/spotify', spotifyRouter)
+app.use('/spotify/v1', spotifyRouter)
 
 app.listen(PORT, ()=> {
     console.log(`Server running on ${PORT}`)
