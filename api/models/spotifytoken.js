@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const spotifyTokenSchema = new mongoose.Schema({
     access_token: {
-        type: String,
+        type: String,   
         required: true,
     },
     refresh_token: {

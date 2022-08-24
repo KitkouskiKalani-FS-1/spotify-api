@@ -7,26 +7,9 @@ const randomstring = require('randomstring');
 const URLSearchParams = require('urlsearchparams');
 const { request } = require('http');
 const SpotifyWebApi = require('spotify-web-api-node');
-const SpotifyToken = require('../models/spotifytoken')
+const SpotifyToken = require('../models/spotifytoken');
+const now = new Date().getTime()
 
-
-// const storeToken = async (req, res, next)=>{
-//     const token = new SpotifyToken({
-//     accessToken:req.access_token,
-//     refreshToken:req.refresh_token,
-//     expiresIn: req.expires_in
-//     })
-//     try{
-//         const newToken = await token.save();
-//         return res.status(201).json(newToken)
-//     } catch(error) {
-//         return res.status(400).json({ message: error.message })
-//     }
-//     return next()
-// }
-router.get('/token', (req,res)=>{
-
-})
 
 // API Login
 router.get('/login', (req,res) =>{
@@ -46,15 +29,40 @@ router.get('/login', (req,res) =>{
     // res.json("Logging in user")
 })
 
-router.get('/checktoken', (req,res)=>{
-    
-})
-    //Auth code not working
+const requestRefreshToken = async(refreshToken, token) =>{
+    console.log(refreshToken)
+    console.log(token)
+    return axios({
+        method: 'POST',
+        url: 'https://accounts.spotify.com/api/token', 
+        refresh_token: refreshToken + 'refresh_token',
+        headers: {
+          'Authorization': 'Basic ' + (new Buffer.from(process.env.CLIENT_ID + ':' + process.env.CLIENT_SECRET).toString('base64')),
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      }).then(({ data }) => {
+        data.expires_in = new Date().getTime() + data.expires_in
+        token.update( data )
+        return token.save()
+      }).catch((error) => { return false })
+}
 
-    
-    
+const checkValidToken = async(res, req, next) =>{
+    console.log("calling middleware")
+    const token = await SpotifyToken.findOne({}).sort({"expires_in": -1}).limit(1)
+    if(!token){
+        res.redirect('http://localhost:3000')
+        return next();
+    }
+    else if(now>token.expires_in){
+        requestRefreshToken(token.refresh_token, token)
+        return next();
+    }
+    return next ();
+}
+ 
 //API Authenticate
-router.post('/auth', function (req, res) {
+router.post('/auth', checkValidToken, function (req, res) {
     const code = req.body.code
     const spotifyApi = new SpotifyWebApi({
         redirectUri:'http://localhost:3000',
@@ -69,11 +77,11 @@ router.post('/auth', function (req, res) {
             const token = new SpotifyToken({
             access_token:data.body.access_token,
             refresh_token:data.body.refresh_token,
-            expires_in: data.body.expires_in
+            expires_in: new Date().getTime() + data.body.expires_in
             })
             try{
                 const newToken = token.save();
-                res.status(201).json(newToken)
+                res.status(201).json(token)
             } catch(error) {
                 res.status(400).json({ message: error.message })
             }
@@ -81,62 +89,50 @@ router.post('/auth', function (req, res) {
         .catch(err =>{
             console.log(err)
             res.sendStatus(400)
-        })  
-
-    //Spotify API documentation
-
-    // var code = req.query.code || null;
-    // var state = req.query.state || null;
-  
-    // if (state === null) {
-    //   res.redirect('/#' +
-    //     querystring.stringify({
-    //       error: 'state_mismatch'
-    //     }));
-    // } else {
-    //   var authOptions = {
-    //     url: 'https://accounts.spotify.com/api/token',
-    //     form: {
-    //       code: code,
-    //       redirect_uri: "http://localhost:3001/spotify/v1/token",
-    //       grant_type: 'authorization_code'
-    //     },
-    //     headers: {
-    //       'Authorization': 'Basic ' + (new Buffer(process.env.CLIENT_ID + ':' + process.env.CLIENT_SECRET).toString('base64'))
-    //     },
-    //     json: true
-    //   };
-    //   axios.post(authOptions, (error, response, body)=>{
-          
-    //   })
-    // }
-
-    ///
-    ///
-    ///
-
-    // Not fully working axios request in auth
-    // var code = req.query.code || null;
-    // var state = req.query.state || null;
-    // axios({
-    //     method: 'POST',
-    //     url: 'https://accounts.spotify.com/api/token',
-    //     form:{
-    //         code: code,
-    //         redirect_uri: "http://localhost:3001/spotify/v1/token",
-    //         grant_type: 'authorization_code',
-    //     },
-    //     headers: {
-    //         'Authorization': 'Basic ' + (new Buffer(process.env.CLIENT_ID + ':' + process.env.CLIENT_SECRET).toString('base64')),
-    //         'Content-Type': 'application/x-www-form-urlencoded'
-    //     }
-    //     }, (error, response, body)=>{
-    //         console.log('passed auth')
-    // })  
+        })   
   });   
 
-router.get('/token', (req,res)=>{
-    res.send(req.query.authorization_code)
+router.post('/search', checkValidToken, async (req,res)=>{
+    // let spotifyArtists;
+    // let spotifyAlbums;
+    // let spotifyPlaylists;
+    // const spotifyWebApi = new SpotifyWebApi({
+    //     clientId: process.env.CLIENT_ID,
+    // })
+    // spotifyWebApi.setAccessToken({token}.token.access_token)
+    // spotifyWebApi.searchArtists(req.body.searchInput).then(data=>{   
+    //     spotifyArtists=data.body.artists;
+    // })
+    // spotifyWebApi.searchPlaylists(req.body.searchInput).then(data=>{   
+    //     spotifyPlaylists=data.body.playlists
+    // })
+    // spotifyWebApi.searchAlbums(req.body.searchInput).then(data=>{   
+    //     spotifyAlbums= data.body.albums
+    // })
+    // res.json({
+    //     artists: spotifyArtists,
+    //     playlists: spotifyPlaylists,
+    //     albums: spotifyPlaylists
+    // })
+    const token = await SpotifyToken.findOne({})
+
+    await axios({
+        method: 'GET',
+        url: 'https://api.spotify.com/v1/search',
+        params: {
+          type: 'artist,playlist,album',
+          q: req.body.searchInput,
+          limit: 5
+        },
+        headers: { 
+          'Authorization': 'Bearer ' + token.access_token,
+          'Content-Type': 'application/json'
+        }
+      }).then(({data}) => {
+        res.json(data)
+      }).catch((error) => {
+        res.json(error)
+      })
 })
 
 module.exports = router;
