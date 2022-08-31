@@ -25,7 +25,7 @@ router.get('/login', (req,res) =>{
       state: state
     }));
     
-
+    
     // res.json("Logging in user")
 })
 
@@ -62,7 +62,7 @@ const checkValidToken = async(res, req, next) =>{
 }
  
 //API Authenticate
-router.post('/auth', checkValidToken, function (req, res) {
+router.post('/auth', function (req, res) {
     const code = req.body.code
     const spotifyApi = new SpotifyWebApi({
         redirectUri:'http://localhost:3000',
@@ -92,7 +92,7 @@ router.post('/auth', checkValidToken, function (req, res) {
         })   
   });   
 
-router.post('/search', checkValidToken, async (req,res)=>{
+router.post('/search', async (req,res)=>{
     // let spotifyArtists;
     // let spotifyAlbums;
     // let spotifyPlaylists;
@@ -114,7 +114,8 @@ router.post('/search', checkValidToken, async (req,res)=>{
     //     playlists: spotifyPlaylists,
     //     albums: spotifyPlaylists
     // })
-    const token = await SpotifyToken.findOne({})
+
+    // const token = await SpotifyToken.findOne({})
 
     await axios({
         method: 'GET',
@@ -122,10 +123,10 @@ router.post('/search', checkValidToken, async (req,res)=>{
         params: {
           type: 'artist,playlist,album',
           q: req.body.searchInput,
-          limit: 5
+          limit: 3
         },
         headers: { 
-          'Authorization': 'Bearer ' + token.access_token,
+          'Authorization': 'Bearer ' + req.body.accessToken,
           'Content-Type': 'application/json'
         }
       }).then(({data}) => {
