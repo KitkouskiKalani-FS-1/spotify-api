@@ -9,11 +9,15 @@ MongoDB Compass<br/>
 
 
 # Getting Started
-Create a .env file within the api directory, fill it out DATABASE_URL with your mongodb link.
-Then open 2 terminals and cd into the api folder in one of them and run npm start in that terminal window,
-then in the other cd into spotify-react and run npm start as well. You should see the project running on http://localhost:3000
+Create a .env file within the api directory, fill it out DATABASE_URL with your mongodb link.<br/>
+Then open 2 terminal windows and cd into the api folder in one of them and run npm start in that terminal window,<br/>
+then in the other cd into spotify-react and run npm start as well.<br/>
+You should see the project running on http://localhost:3000
 
 # Links
 
 [http://localhost:3000](http://localhost:3000) - The homepage for the application<br/>
-[http://localhost:3001/spotify](http://localhost:3001/spotify) - Will be more robust in future, just returns a static JSON currently
+[http://localhost:3001](http://localhost:3001) - Express Backend (No actual functionality on root route)<br/>
+[http://localhost:3001/spotify/v1/login](http://localhost:3001/spotify/v1/login) - Authorizes the user using Spotify<br/>
+[http://localhost:3001/spotify/v1/auth](http://localhost:3001/spotify/v1/auth) - Requests JWT from Spotify API and saves it into mongodb<br/>
+[http://localhost:3001/spotify/v1/search](http://localhost:3001/spotify/v1/search) - Searches Spotify Web API for artists, playlists and albums <br/>
